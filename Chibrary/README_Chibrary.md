@@ -36,19 +36,24 @@
     - username
     - password
     - info
-        - createdAt
-        - lastLogin
+        - createdAt (float, 表示秒数)
+        - lastLogin (0表示没有登录过)
+        - level: 1 (1普通游客)
         - birthday
         - gender (性别)
         - head (url)
         - status: normal/banned
-        - level: 5
     - statistics (统计数据)
         - upload
         - download
         - comments
         - wishes
         - recommends
+
+*token* 是登录后生成的通行码
+- token
+    - token
+    - username
 
 - bookSource
     - name
@@ -59,7 +64,8 @@
 - book
     - name
     - bid(_id) (本站)(主键)
-    - src: dict (name(wenku8 or dmzj or...))
+    - src: dict
+        - name (wenku8 or dmzj or...)
         - args (用来调取书源的参数)
             - bid
             - ...
@@ -67,14 +73,15 @@
             - lastUpdate (更新时间)
             - update (更新内容)
     - info
-        - name
+        - name(*)
+        - description(*)
+        - author(*)
+        - stars (*)(评分，Float，5 max)
         - bid
         - cover
-        - author
         - createdAt
         - lastUpdate
-        - description
-        - stars (评分，Float，5 max)
+        - starCount (评分人数)
     - tags: list
 
 ----------
@@ -145,7 +152,7 @@
         - /updateInfo: {...}
     
     - /books
-        - /upload: {username, bid, src: {name, data: {update, }}}
+        - /upload: {token, bid, src: {name, data: {update, }}}
         - /download: {bid}
         - /{bid} => 书籍主页
     
