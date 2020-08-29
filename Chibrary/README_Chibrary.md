@@ -28,6 +28,8 @@
 
 还是使用MongoDB。
 
+---------
+
 **基本功能**
 
 - user
@@ -39,12 +41,20 @@
         - birthday
         - gender (性别)
         - head (url)
+        - status: normal/banned
+        - level: 5
     - statistics (统计数据)
         - upload
         - download
         - comments
         - wishes
         - recommends
+
+- bookSource
+    - name
+    - info
+        - createdAt
+        - path (调用的包的路径)
 
 - book
     - name
@@ -64,6 +74,7 @@
         - createdAt
         - lastUpdate
         - description
+        - stars (评分，Float，5 max)
     - tags: list
 
 ----------
@@ -74,5 +85,78 @@
     - tag: dict
         - bid
 
+- comments
+    - bid
+    - username
+    - createdAt
+    - content
+        - type: text/html/md
+        - data
+
+- bookshelves (书架(散装))
+    - username
+    - bid
+
+- wishes (心愿单)
+    - username
+    - bid
+
+- recommends
+    - username
+    - bid
+    
+
 ### 接口设计
 
+**返回格式**
+```json
+{
+"code": 0,
+"message": "Success",
+"data": {
+  "token": "___",
+  "searchResult": {
+    "total": 1,
+    "data": [],
+    "page": 1,
+    "limit": 20
+  },
+  "userInfo": {
+    "username": "username",
+    "...": "..."
+  },
+  "bookInfo": {
+    "...": "..."
+  },
+  "bookSource": {
+    "...": "..."
+  }
+}
+}
+```
+
+- /api_v1 *API和动态网页的内容由nginx重定向到server*
+    - /user
+        - /login: {username, password(前端就sha1加密一次), captcha}
+            - =>token
+        - /logout: {token}
+        - /register: {username, password(前端就sha1加密一次), captcha}
+        - /info: {username}
+        - /updateInfo: {...}
+    
+    - /books
+        - /upload: {username, bid, src: {name, data: {update, }}}
+        - /download: {bid}
+        - /{bid} => 书籍主页
+    
+    - /search: {query, type: book/user, page=1, limit=20}
+    
+    - /bookSource
+        - /find: {name}
+
+- /user
+    - /{username} => 用户主页
+- /book
+    - /{bid} => 书籍主页
+*后面静态的东西重定向到腾讯云*
+- /apps
