@@ -1,6 +1,6 @@
 class ChibraryException:
     class BaseException(Exception):
-        def __init__(self, exception_message):
+        def __init__(self, exception_message=''):
             self.message = exception_message
             self.default_message = ''
             self.my_init()
@@ -38,3 +38,8 @@ class ChibraryException:
     class BookNotFound(BaseException):
         def my_init(self):
             self.default_message = 'Book not found'
+
+    class ArgsError(BaseException):
+        def my_init(self):
+            self.default_message = 'Args not fit'
+
