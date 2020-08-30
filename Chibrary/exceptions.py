@@ -30,7 +30,7 @@ class ChibraryException:
     class UserNotFound(BaseException):
         def my_init(self):
             self.default_message = 'user not found'
-    
+
     class BookExists(BaseException):
         def my_init(self):
             self.default_message = 'Book exists'
@@ -39,7 +39,18 @@ class ChibraryException:
         def my_init(self):
             self.default_message = 'Book not found'
 
+    class BookSourceExists(BaseException):
+        def my_init(self):
+            self.default_message = 'Book source exists'
+
+    class BookSourceNotFound(BaseException):
+        def my_init(self):
+            self.default_message = 'Book source not found'
+
     class ArgsError(BaseException):
         def my_init(self):
             self.default_message = 'Args not fit'
 
+    class FileConfigError(BaseException):
+        def my_init(self):
+            self.default_message = 'You must provide both or neither of data and url'

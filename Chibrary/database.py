@@ -1,14 +1,13 @@
 from pymongo import *
 import time
 import hashlib
-from Chibrary.config import *
+from Chibrary import config
+from Chibrary.config import ChibraryException, logger
 
 
 class ChibraryDB:
-    DATABASE = 'localhost'
-
     def __init__(self):
-        self.conn = MongoClient(ChibraryDB.DATABASE)
+        self.conn = MongoClient(config.DATABASE)
         self.db = self.conn.chibrary
         self.book_init_bid()
 
@@ -16,6 +15,7 @@ class ChibraryDB:
         collections = ['book', 'user', 'token']
         for col in collections:
             self.db[col].drop()
+        self.book_init_bid()
 
     # 检查用户登录，返回Bool
     def user_check(self, username: str, password: str):
@@ -72,7 +72,7 @@ class ChibraryDB:
         col = self.db.user
         col.update_one({'username': username}, {'$set': {'info': user['info']}})
 
-    def user_delete(self, username):
+    def user_delete(self, username: str):
         user = self.user_find(username)
         if user is None:
             raise ChibraryException.UserNotFound('Username %s not found.' % username)
@@ -87,7 +87,7 @@ class ChibraryDB:
             del query['_id']
         if query is not None:
             return query
-        token = hashlib.sha1((username + str(time.time()) + config.secret).encode()).hexdigest()
+        token = hashlib.sha1((username + str(time.time()) + config.config.secret).encode()).hexdigest()
         token_data = {
             'username': username,
             'token': token
@@ -147,13 +147,13 @@ class ChibraryDB:
         book = {
             'name': name,
             'bid': bid,
-            'src': {},
+            'sources': {},
             'info': {
                 'name': name,
                 'bid': bid,
                 'description': description,
                 'author': author,
-                'cover': DEFAULT_BOOK_COVER,
+                'cover': config.DEFAULT_BOOK_COVER,
                 'creartedAt': time.time(),
                 'lastUpdate': 0,
                 'stars': 0,
@@ -200,13 +200,89 @@ class ChibraryDB:
 
     # 模糊搜书：info -> name, bid, author...
     # 分页?
-    def book_search(self, query: dict) -> list:
+    def book_search(self, query: dict, page: int = 1, limit: int = 30) -> list:
         result = []
         col = self.db.book
         for key in query:
-            data = list(col.find({'info.' + key: {'$regex': query[key]}}, {'_id': 0}))
+            data = list(
+                col.find({'info.' + key: {'$regex': query[key]}}, {'_id': 0}).limit(limit).skip(limit * (page - 1)))
             result.extend(data)
         return result
+
+    # 为书籍增加书源
+    # source: {name, args:{bid}}
+    def book_add_source(self, bid: int, source: dict):
+        book = self.book_find(bid)
+        if book is None:
+            raise ChibraryException.BookNotFound('Book (bid=%s) not found.' % bid)
+        if 'name' not in source or 'args' not in source or type(source['args']) is not dict \
+                or 'key' not in source['args']:
+            raise ChibraryException.ArgsError
+        col = self.db.book
+        sources = book['sources']
+        if source['name'] in sources:
+            raise ChibraryException.BookSourceExists
+        source['data'] = {
+            'lastUpdate': 0,
+            'update': '',
+        }
+        sources[source['name']] = source
+        col.update_one({'bid': bid}, {'$set': {'sources': sources}})
+
+    # 增加书源
+    def source_add(self, name: str, author: str, description: str = '', nick: str = None):
+        col = self.db.bookSource
+        if self.source_find(name) is not None:
+            raise ChibraryException.BookSourceExists('Book source %s exists.' % name)
+        if nick is None:
+            nick = name
+        col.insert_one({
+            'name': name,
+            'info': {
+                'createdAt': time.time(),
+                'description': description,
+                'nick': nick,
+                'author': author,
+            }
+        })
+
+    def source_find(self, name: str) -> dict or None:
+        col = self.db.bookSource
+        query = {'name': name}
+        result = list(col.find(query, {'_id': 0}))
+        if len(result) == 0:
+            return None
+        return result[0]
+
+    # 书源关键词搜索
+    def source_search(self, keyword: str) -> list:
+        col = self.db.bookSource
+        data = []
+        result = list(col.find({'name': {'$regex': keyword}}, {'_id': 0}))
+        data.extend(result)
+        result = list(col.find({'info.author': {'$regex': keyword}}, {'_id': 0}))
+        data.extend(result)
+        result = list(col.find({'info.description': {'$regex': keyword}}, {'_id': 0}))
+        data.extend(result)
+        return data
+
+    # 更新书源信息
+    # 参数info中有的key才会更新
+    def source_update_info(self, name: str, info: dict):
+        source = self.source_find(name)
+        if source is None:
+            raise ChibraryException.BookSourceNotFound('Book source %s not found.' % name)
+        for key in info:
+            source['info'][key] = info[key]
+        col = self.db.bookSource
+        col.update_one({'name': name}, {'$set': {'info': source['info']}})
+
+    def source_delete(self, name: str):
+        source = self.source_find(name)
+        if source is None:
+            raise ChibraryException.BookSourceNotFound('Book source %s not found.' % name)
+        col = self.db.bookSource
+        col.delete_one({'name': name})
 
 
 if __name__ == '__main__':

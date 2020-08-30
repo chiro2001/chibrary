@@ -1,17 +1,17 @@
 import json
 from flask import *
-from Chibrary.server import app, db
+from Chibrary.server import my_app, db
 from Chibrary.utils import *
 
 
-@app.route('/user/<string:username>', methods=['GET'])
+@my_app.route('/user/<string:username>', methods=['GET'])
 def user_space(username: str):
     print(request)
     return 'user %s\'s space' % username
 
 
 # 登录，返回user
-@app.route('/api_v1/user/login', methods=['GET'])
+@my_app.route('/api_v1/user/login', methods=['GET'])
 def user_login():
     args = parse_url_query(request.url)
     if not check_args(args, ['username', 'password']):
@@ -28,7 +28,7 @@ def user_login():
     })
 
 
-@app.route('/api_v1/user/logout', methods=['GET'])
+@my_app.route('/api_v1/user/logout', methods=['GET'])
 def user_logout():
     args = parse_url_query(request.url)
     if not check_args(args, ['token']):
@@ -38,7 +38,7 @@ def user_logout():
 
 
 # 注册，只返回成功，不返回数据
-@app.route('/api_v1/user/register', methods=['GET'])
+@my_app.route('/api_v1/user/register', methods=['GET'])
 def user_register():
     args = parse_url_query(request.url)
     if not check_args(args, ['username', 'password']):

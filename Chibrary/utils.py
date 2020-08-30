@@ -1,7 +1,10 @@
 import json
+from flask import request
 from Chibrary import config
 from Chibrary.config import logger
 from Chibrary.exceptions import *
+from functools import wraps
+from urllib import parse
 
 
 def parse_url_query(url: str) -> dict:
@@ -30,8 +33,25 @@ def parse_url_query(url: str) -> dict:
                 except ValueError:
                     pass
         if val is not None:
-            result[key] = val
+            if type(val) is str:
+                result[key] = parse.unquote(val)
+            else:
+                result[key] = val
     return result
+
+
+def form_url_query(url: str, data: dict):
+    if not url.lower().startswith('http://') \
+            and not url.lower().startswith('https://'):
+        logger.warning('Provided wrong url %s !' % url)
+        return url
+    if len(data) == 0:
+        return url
+    query = '?'
+    for key in data:
+        query = query + key + '=' + parse.quote(str(data[key])) + '&'
+    query = query[:-1]
+    return url + query
 
 
 """
@@ -88,9 +108,22 @@ def format_file_size(size_by_bytes: int) -> str:
         size_by_bytes = size_by_bytes / 1000
         if index == len(units):
             break
+    if size_by_bytes > 20:
+        return "%.0f%s" % (size_by_bytes, unit)
     return "%.2f%s" % (size_by_bytes, unit)
+
+
+def admin_check(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        args = parse_url_query(request.url)
+        print(args)
+        print(request)
+        return f(*args, **kwargs)
+
+    return decorated()
 
 
 if __name__ == '__main__':
     print(parse_url_query('http://blog.com/sss/ssss/s?wd=dsfa&a=fdsa&a=1&b=1.1&a=s'))
-    print(format_file_size(10250000000000))
+    print(format_file_size(20250000))

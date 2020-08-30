@@ -1,12 +1,16 @@
 """
-:Description: 书源的基类。
+基于url记录的书源。
 """
+
+from Chibrary.BookSouces.basic import BSBasic
 from Chibrary import config
+from pymongo import *
 
 
-class BSBasic:
+class BSWebUrl(BSBasic):
     def __init__(self):
-        pass
+        super().__init__()
+        self.db = MongoClient(config.DATABASE)
 
     """
     搜索：query为{"key": ..., "name": ...}结构。
@@ -27,10 +31,14 @@ class BSBasic:
     """
     上传：根据info上传file。
     成功/失败返回True/False，不支持返回None。
+    这里file中取url。
     """
 
     def upload(self, info: dict, file: config.File) -> bool or None:
-        pass
+        if file.url is None:
+            return None
+
+
 
     """
     删除：根据key删除文件。

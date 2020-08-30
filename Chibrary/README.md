@@ -59,15 +59,17 @@
     - name
     - info
         - createdAt
-        - path (调用的包的路径)
+        - description
+        - author
+        - nick
 
 - book
     - name
     - bid(_id) (本站)(主键)
-    - src: dict
+    - sources: dict
         - name (wenku8 or dmzj or...)
         - args (用来调取书源的参数)
-            - bid
+            - key
             - ...
         - data
             - lastUpdate (更新时间)
@@ -88,9 +90,9 @@
 
 **拓展功能**
 
-- tag2book (双向查询，数据冗余一下)
-    - tag: dict
-        - bid
+- tag
+    - tag
+    - bid
 
 - comments
     - bid
@@ -123,10 +125,8 @@
 "data": {
   "token": "___",
   "searchResult": {
-    "total": 1,
     "data": [],
-    "page": 1,
-    "limit": 20
+    "page": 1
   },
   "userInfo": {
     "username": "username",
@@ -137,6 +137,10 @@
   },
   "bookSource": {
     "...": "..."
+  },
+  "download": {
+    "url": "...",
+    "filename": "..."
   }
 }
 }
@@ -151,16 +155,21 @@
         - /info: {username}
         - /updateInfo: {...}
     
-    - /books
-        - /upload: {token, bid, src: {name, data: {update, }}}
-        - /download: {bid}
-        - /{bid} => 书籍主页
+    - /book
+        - /add: {name, author, description}
+        - /upload: {@token, bid, src: {name, data: {update, }}}
+        - /download/<name>: {bid, key}
+        - /addSource/<name>: {bid, key}
+        - /search: {}
     
     - /search: {query, type: book/user, page=1, limit=20}
     
     - /bookSource
+        - /add: {name, author, description, nick} @token
+        - /search: {keyword}
         - /find: {name}
-*这部分可以重定向到腾讯云*
+        - /delete: {name} @token
+*这部分可以重定向到腾讯云做纯前端处理*
 - /user
     - /{username} => 用户主页
 - /book
