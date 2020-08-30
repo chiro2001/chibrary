@@ -38,8 +38,8 @@
     - info
         - createdAt (float, 表示秒数)
         - lastLogin (0表示没有登录过)
-        - level: 1 (1普通游客)
-        - birthday
+        - level: 1 (1普通游客) 10 (10管理) 2 (2正式用户)
+        - birthday: time.time()
         - gender (性别)
         - head (url)
         - status: normal/banned
@@ -66,8 +66,9 @@
 - book
     - name
     - bid(_id) (本站)(主键)
-    - sources: dict
+    - sources: dict -> list
         - name (wenku8 or dmzj or...)
+        - username
         - args (用来调取书源的参数)
             - key
             - ...
@@ -146,26 +147,27 @@
 }
 ```
 
-- /api_v1 *API和动态网页的内容由nginx重定向到server*
+- /api/v1 *API和动态网页的内容由nginx重定向到server*
     - /user
         - /login: {username, password(前端就sha1加密一次), captcha}
             - =>token
-        - /logout: {token}
+        - /logout: @token
         - /register: {username, password(前端就sha1加密一次), captcha}
         - /info: {username}
-        - /updateInfo: {...}
+        - /updateInfo: {...} @token
     
     - /book
-        - /add: {name, author, description}
-        - /upload: {@token, bid, src: {name, data: {update, }}}
+        - <bid>: (获取信息)
+        - /add: {name, author, description} @token
+        - /upload: {bid, src: {name, data: {update, }}} @token
         - /download/<name>: {bid, key}
-        - /addSource/<name>: {bid, key}
+        - /addSource/<name>: {bid, key} @token
         - /search: {}
     
     - /search: {query, type: book/user, page=1, limit=20}
     
     - /bookSource
-        - /add: {name, author, description, nick} @token
+        - /add: {name, author, description, nick} @admin
         - /search: {keyword}
         - /find: {name}
         - /delete: {name} @token

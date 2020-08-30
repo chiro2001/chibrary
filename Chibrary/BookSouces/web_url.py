@@ -4,13 +4,14 @@
 
 from Chibrary.BookSouces.basic import BSBasic
 from Chibrary import config
-from pymongo import *
+import os
+# from pymongo import *
 
 
 class BSWebUrl(BSBasic):
     def __init__(self):
         super().__init__()
-        self.db = MongoClient(config.DATABASE)
+        # self.db = MongoClient(config.DATABASE)
 
     """
     搜索：query为{"key": ..., "name": ...}结构。
@@ -26,7 +27,8 @@ class BSWebUrl(BSBasic):
     """
 
     def download(self, key) -> None or config.File:
-        pass
+        file = config.File(os.path.basename(key), key)
+        return file
 
     """
     上传：根据info上传file。

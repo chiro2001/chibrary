@@ -36,10 +36,12 @@ class ResultMessage:
         login = 'Login failed.'
         args = 'Invalid args.'
         userExist = 'Username has been taken.'
+        userNotFound = 'Username not found.'
         bookSourceNotFound = 'Book source not found.'
         bookSourceExist = 'Book source exist.'
         bookNotFound = 'Book not found.'
         bookExist = 'Book exist.'
+        permissionNotEnough = 'You have no permission to do that.'
 
     class Success:
         success = 'Success.'
@@ -56,7 +58,15 @@ code = {
     '7': ResultMessage.Error.bookSourceExist,
     '8': ResultMessage.Error.bookNotFound,
     '9': ResultMessage.Error.bookExist,
+    '10': ResultMessage.Error.permissionNotEnough,
+    '11': ResultMessage.Error.userNotFound,
 }
+
+"""
+管理
+"""
+
+DEFAULT_ADMINS = ['chiro', ]
 
 '''
 常量部分
@@ -73,6 +83,7 @@ DATABASE = 'localhost'
 # 默认常量
 DEFAULT_BOOK_COVER_SIZE = [200, 300]
 DEFAULT_BOOK_COVER = 'http://bed-1254016670.cos.ap-guangzhou.myqcloud.com/my_imgs/MR3EcJ_place_holder.png'
+DEFAULT_USER_HEAD = 'http://bed-1254016670.cos.ap-guangzhou.myqcloud.com/my_imgs/6i8ZPn__head_fin.png'
 
 config = Config()
 logger = get_logger(__name__)

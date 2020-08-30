@@ -12,7 +12,7 @@ class ChibraryDB:
         self.book_init_bid()
 
     def clear_all(self):
-        collections = ['book', 'user', 'token']
+        collections = ['book', 'user', 'token', 'bookSource']
         for col in collections:
             self.db[col].drop()
         self.book_init_bid()
@@ -31,13 +31,16 @@ class ChibraryDB:
         password_hashed = hashlib.sha1(password.encode()).hexdigest()
         if self.user_find(username) is not None:
             raise ChibraryException.UserExists('Username %s has existed.' % username)
+        level = 1
+        if username in config.DEFAULT_ADMINS:
+            level = 10
         col.insert_one({
             'username': username,
             'password': password_hashed,
             'info': {
                 'createdAt': time.time(),
                 'lastLogin': 0,
-                'level': 1,
+                'level': level,
             },
             'statistics': {},
         })
@@ -72,6 +75,14 @@ class ChibraryDB:
         col = self.db.user
         col.update_one({'username': username}, {'$set': {'info': user['info']}})
 
+    def user_update_last_login_time(self, username: str):
+        user = self.user_find(username)
+        if user is None:
+            raise ChibraryException.UserNotFound('Username %s not found.' % username)
+        user['info']['lastLogin'] = time.time()
+        col = self.db.user
+        col.update_one({'username': username}, {'$set': {'info': user['info']}})
+
     def user_delete(self, username: str):
         user = self.user_find(username)
         if user is None:
@@ -83,9 +94,9 @@ class ChibraryDB:
     # 已经存在token则返回已经存在的token_data
     def token_create(self, username: str) -> dict:
         query = self.token_find_by_username(username)
-        if '_id' in query:
-            del query['_id']
         if query is not None:
+            if '_id' in query:
+                del query['_id']
             return query
         token = hashlib.sha1((username + str(time.time()) + config.config.secret).encode()).hexdigest()
         token_data = {
@@ -112,7 +123,7 @@ class ChibraryDB:
 
     def token_destroy(self, token: str = None, username: str = None):
         if token is None and username is None:
-            logger.warning('You must provide one of token and username!')
+            logger.warning('Error. You must provide one of token and username!')
             return
         query = {}
         if token is not None:
@@ -210,23 +221,30 @@ class ChibraryDB:
         return result
 
     # 为书籍增加书源
-    # source: {name, args:{bid}}
-    def book_add_source(self, bid: int, source: dict):
+    # source: {name, username, args:{key}}
+    def book_add_source(self, bid: int, username: str, source: dict):
         book = self.book_find(bid)
         if book is None:
             raise ChibraryException.BookNotFound('Book (bid=%s) not found.' % bid)
-        if 'name' not in source or 'args' not in source or type(source['args']) is not dict \
+        if 'name' not in source \
+                or 'args' not in source or type(source['args']) is not dict \
                 or 'key' not in source['args']:
             raise ChibraryException.ArgsError
+        if self.user_find(username=username) is None:
+            raise ChibraryException.UserNotFound
         col = self.db.book
         sources = book['sources']
-        if source['name'] in sources:
-            raise ChibraryException.BookSourceExists
+        # 可以增加多个同类型书源
+        # if source['name'] in sources:
+        #     raise ChibraryException.BookSourceExists
+        source['username'] = username
         source['data'] = {
             'lastUpdate': 0,
             'update': '',
         }
-        sources[source['name']] = source
+        if source['name'] not in sources:
+            sources[source['name']] = []
+        sources[source['name']].append(source)
         col.update_one({'bid': bid}, {'$set': {'sources': sources}})
 
     # 增加书源

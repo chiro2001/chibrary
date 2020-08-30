@@ -5,7 +5,7 @@ from Chibrary.utils import *
 
 
 # 添加书源，只返回成功，不返回数据
-@my_app.route('/api_v1/bookSource/add', methods=['GET'])
+@my_app.route('/api/v1/bookSource/add', methods=['GET'])
 def book_source_add():
     args = parse_url_query(request.url)
     if not check_args(args, ['name', 'author']):

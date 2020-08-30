@@ -12,8 +12,8 @@ def book_index(bid: int):
     return 'book %s\'s index' % bid
 
 
-# 添加书籍，只返回成功，不返回数据
-@my_app.route('/api_v1/book/add', methods=['GET'])
+# 添加书籍，返回数据
+@my_app.route('/api/v1/book/add', methods=['GET'])
 def book_add():
     args = parse_url_query(request.url)
     if not check_args(args, ['name', 'author', 'description']):
@@ -27,8 +27,20 @@ def book_add():
     })
 
 
+# 添加书籍，返回数据
+@my_app.route('/api/v1/book/<int:bid>', methods=['GET'])
+def book_info(bid: int):
+    try:
+        book = db.book_find(bid)
+    except ChibraryException.BookNotFound:
+        return make_result(8)
+    return make_result(0, data={
+        'bookInfo': book
+    })
+
+
 # 按照数据的书源搜索书籍
-@my_app.route('/api_v1/book/search', methods=['GET'])
+@my_app.route('/api/v1/book/search', methods=['GET'])
 def book_search():
     args = parse_url_query(request.url)
     # page参数可选
@@ -47,8 +59,8 @@ def book_search():
 
 
 # 参数是书源，返回download数据结构
-# 返回值中华filename有时候是缺省的
-@my_app.route('/api_v1/book/download/<string:source_name>', methods=['GET'])
+# 返回值中的filename有时候是缺省的
+@my_app.route('/api/v1/book/download/<string:source_name>', methods=['GET'])
 def book_download(source_name: str):
     args = parse_url_query(request.url)
     if not check_args(args, ['bid', 'key']):
@@ -78,13 +90,14 @@ def book_download(source_name: str):
 
 
 # 为书籍添加书源，只返回成功，不返回数据
-@my_app.route('/api_v1/book/addSource/<string:name>', methods=['GET'])
+@my_app.route('/api/v1/book/addSource/<string:name>', methods=['GET'])
+@login_check
 def book_add_source(name: str):
     args = parse_url_query(request.url)
     if not check_args(args, ['bid', 'key']):
         return make_result(5)
     if db.source_find(name) is None:
-        return make_result(7)  # book source not found
+        return make_result(8)  # book source not found
     bid = args['bid']
     key = args['key']
     source = {
@@ -93,8 +106,10 @@ def book_add_source(name: str):
             'key': key
         }
     }
+    user = get_user_from_headers()
+    username = user['username']
     try:
-        db.book_add_source(bid, source=source)
+        db.book_add_source(bid, username, source=source)
     except ChibraryException.BookNotFound:
         return make_result(8)
     except ChibraryException.BookSourceExists:
