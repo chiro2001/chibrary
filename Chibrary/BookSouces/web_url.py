@@ -3,7 +3,7 @@
 """
 
 from Chibrary.BookSouces.basic import BSBasic
-from Chibrary import config
+from Chibrary import beans
 import os
 # from pymongo import *
 
@@ -26,8 +26,8 @@ class BSWebUrl(BSBasic):
     key不一定是数字。返回File中data和url二选一。
     """
 
-    def download(self, key) -> None or config.File:
-        file = config.File(os.path.basename(key), key)
+    def download(self, key) -> None or beans.File:
+        file = beans.File(os.path.basename(key), key)
         return file
 
     """
@@ -36,7 +36,7 @@ class BSWebUrl(BSBasic):
     这里file中取url。
     """
 
-    def upload(self, info: dict, file: config.File) -> bool or None:
+    def upload(self, info: dict, file: beans.File) -> bool or None:
         if file.url is None:
             return None
 

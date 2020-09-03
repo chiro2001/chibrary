@@ -10,6 +10,7 @@ from Chibrary.utils import *
 import Chibrary.user
 import Chibrary.book
 import Chibrary.bookSource
+import Chibrary.my_token
 
 
 @my_app.errorhandler(Exception)

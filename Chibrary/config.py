@@ -1,14 +1,23 @@
 import json
 from io import BytesIO
+import requests
 import os
 from Chibrary.base_logger import get_logger
 from Chibrary.exceptions import *
 
 
 class Config:
+    class COSSecret:
+        def __init__(self, secret_id: str = None, secret_key: str = None, bucket: str = None,
+                     region: str = None, path: str = None):
+            self.secret_id, self.secret_key = secret_id, secret_key
+            self.bucket, self.region = bucket, region
+            self.path = path
+
     def __init__(self):
         self.secret = 'default'
-        self.admin_password = 'default'
+        self.adminPassword = 'default'
+        self.cos_secret = Config.COSSecret()
         try:
             # print(os.path.abspath(os.path.curdir))
             if os.path.exists('config.json'):
@@ -22,9 +31,17 @@ class Config:
                 except KeyError:
                     raise ChibraryException.ConfigJsonError('key:secret not found')
                 try:
-                    self.admin_password = self.data['admin_password']
+                    self.adminPassword = self.data['adminPassword']
                 except KeyError:
-                    raise ChibraryException.ConfigJsonError('key:admin_password not found')
+                    raise ChibraryException.ConfigJsonError('key:adminPassword not found')
+                try:
+                    secret_id, secret_key = self.data['cosSecretId'], self.data['cosSecretKey']
+                    region, bucket = self.data['cosRegion'], self.data['cosBucket']
+                    path = self.data['cosPath']
+                    self.cos_secret = Config.COSSecret(secret_id=secret_id, secret_key=secret_key, region=region,
+                                                       bucket=bucket, path=path)
+                except KeyError:
+                    raise ChibraryException.ConfigJsonError('key:cosSecret* not found')
         except FileNotFoundError:
             raise ChibraryException.ConfigJsonNotFound
 
@@ -88,19 +105,3 @@ DEFAULT_USER_HEAD = 'http://bed-1254016670.cos.ap-guangzhou.myqcloud.com/my_imgs
 config = Config()
 logger = get_logger(__name__)
 
-"""
-数据结构部分
-"""
-
-
-class File:
-    def __init__(self, filename: str, data: bytes = None, url: str = None):
-        if data is None and url is None:
-            raise ChibraryException.FileConfigError
-        self.url, self.data, self.filename = url, data, filename
-
-    def to_dict(self):
-        return {
-            'filename': self.filename,
-            'url': self.url
-        }

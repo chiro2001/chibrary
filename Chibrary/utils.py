@@ -1,5 +1,6 @@
 import json
-from flask import *
+import re
+from flask import request, abort, jsonify
 from Chibrary import config
 from Chibrary.config import logger
 from Chibrary.exceptions import *
@@ -216,6 +217,17 @@ def is_number(s):
     return False
 
 
+# def url_check(url: str):
+#     url = url.lower()
+#     reg = "^(https|http|ftp|rtsp|mms)\\://?([a-zA-Z0-9\\.\\-]+(\\:[a-zA-Z0-9\\.&%\\$\\-]+)*@)?((25[0-5]|2" \
+#           "[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]" \
+#           "{1}[0-9]{1}|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\\.(25[0-5]|" \
+#           "2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])|([a-zA-Z0-9\\-]+\\.)*[a-zA-Z0-9\\-]+\\.[a-zA-Z]" \
+#           "{2,4})(\\:[0-9]+)?(/[^/][a-zA-Z0-9\\.\\,\\?\\'\\\\/\\+&%\\$\\=~_\\-@]*)*$"
+#     print(re.search(url, reg))
+
+
 if __name__ == '__main__':
     print(parse_url_query('http://blog.com/sss/ssss/s?wd=dsfa&a=fdsa&a=1&b=1.1&a=s'))
     print(format_file_size(20250000))
+    # print(url_check('http://www.bilibili.com/'))

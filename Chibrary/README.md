@@ -85,7 +85,7 @@
         - createdAt
         - lastUpdate
         - starCount (评分人数)
-    - tags: list
+        - tags: list
 
 ----------
 
@@ -160,11 +160,17 @@
         - <bid>: (获取信息)
         - /add: {name, author, description} @token
         - /upload: {bid, src: {name, data: {update, }}} @token
+        - /updateInfo: {...} @token
         - /download/<name>: {bid, key}
         - /addSource/<name>: {bid, key} @token
         - /search: {}
     
+    - /cos
+        - /getToken @ token
+    
     - /search: {query, type: book/user, page=1, limit=20}
+    
+    - ~~/download/<bid>/<name>~~
     
     - /bookSource
         - /add: {name, author, description, nick} @admin

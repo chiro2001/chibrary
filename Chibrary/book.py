@@ -12,6 +12,24 @@ def book_index(bid: int):
     return 'book %s\'s index' % bid
 
 
+@my_app.route('/api/v1/book/updateInfo')
+@login_check
+def book_update_info():
+    args = parse_url_query(request.url)
+    if 'bid' not in args:
+        return make_result(5)
+    bid = args['bid']
+    if not is_number(bid):
+        return
+    book = db.book_find()
+    if 'stars' in args or 'bid' in args or 'createdAt' in args or 'lastUpdate' in args or 'starCount' in args:
+        return make_result(5)
+    for key in args:
+        book['info'][key] = args[key]
+    db.book_update_info(book['bid'], book['info'])
+    return make_result(0)
+
+
 # 添加书籍，返回数据
 @my_app.route('/api/v1/book/add', methods=['GET'])
 def book_add():
@@ -87,6 +105,17 @@ def book_download(source_name: str):
             'filename': os.path.basename(config.DEFAULT_BOOK_COVER)
         }
     })
+
+
+# # 直接返回下载链接重定向或者404
+# @my_app.route('/api/v1/download/<int:bid>/<string:name>')
+# def book_download_directly(bid: int, name: str):
+#     book = db.book_find(bid)
+#     if book is None:
+#         abort(404)
+#     if name not in book['sources']:
+#         abort(404)
+#
 
 
 # 为书籍添加书源，只返回成功，不返回数据

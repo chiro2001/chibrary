@@ -1,7 +1,7 @@
 """
 :Description: 书源的基类。
 """
-from Chibrary import config
+from Chibrary import beans
 
 
 class BSBasic:
@@ -21,7 +21,7 @@ class BSBasic:
     key不一定是数字。返回File中data和url二选一。
     """
 
-    def download(self, key) -> None or config.File:
+    def download(self, key) -> None or beans.File:
         pass
 
     """
@@ -29,7 +29,7 @@ class BSBasic:
     成功/失败返回True/False，不支持返回None。
     """
 
-    def upload(self, info: dict, file: config.File) -> bool or None:
+    def upload(self, key, file: beans.File) -> bool or None:
         pass
 
     """

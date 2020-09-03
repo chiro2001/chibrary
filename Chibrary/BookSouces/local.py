@@ -1,8 +1,14 @@
+"""
+本地书源。书储存在本地文件夹。
+"""
+
+
 from Chibrary.BookSouces.basic import BSBasic
-from Chibrary import config
+from Chibrary import config, beans
 from Chibrary.config import logger
 import os
 from urllib import parse
+import traceback
 
 
 class BSLocal(BSBasic):
@@ -42,7 +48,7 @@ class BSLocal(BSBasic):
     key不一定是数字。
     """
 
-    def download(self, key) -> None or config.File:
+    def download(self, key) -> None or beans.File:
         try:
             if key is None or len(key) == 0:
                 return None
@@ -52,18 +58,27 @@ class BSLocal(BSBasic):
         if result is None or len(result) == 0:
             return None
         # with open(os.path.join(self.path, key), 'rb') as f:
-        #     file = config.File(key, data=f.read())
+        #     file = beans.File(key, data=f.read())
         # return file
-        file = config.File(result[0]['filename'], url='http://localhost:8001/%s' % parse.quote(result[0]['filename']))
+        file = beans.File(result[0]['filename'], url='http://localhost:8001/%s' % parse.quote(result[0]['filename']))
         return file
 
     """
     上传：根据info上传file。
     成功/失败返回True/False，不支持返回None。
+    这里的file是data形式。
+    info: {key}
     """
 
-    def upload(self, info: dict, file: config.File) -> bool or None:
-        pass
+    def upload(self, key, file: beans.File) -> bool or None:
+        try:
+            with open(os.path.join(self.path, key), 'wb') as f:
+                f.write(file.data)
+        except Exception as e:
+            traceback.print_exc()
+            logger.warning('Met errors: %s' % str(e))
+            return False
+        return True
 
     """
     删除：根据key删除文件。
@@ -71,4 +86,7 @@ class BSLocal(BSBasic):
     """
 
     def delete(self, key) -> bool or None:
-        pass
+        if not os.path.exists(os.path.join(self.path, key)):
+            return False
+        os.remove(os.path.join(self.path, key))
+        return True

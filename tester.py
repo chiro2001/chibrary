@@ -130,6 +130,8 @@ def test3():
     print('获取书籍信息')
     data = json.loads(requests.get(form_url_query('http://localhost/api/v1/book/1', {}), headers=headers).content)
     print(data)
+    print('修改书籍信息')
+    data = json.loads()
 
 
 if __name__ == '__main__':
