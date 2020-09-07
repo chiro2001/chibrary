@@ -41,12 +41,16 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
+import Alert from '@material-ui/lab/Alert';
+import Collapse from '@material-ui/core/Collapse'
+import { utc } from 'moment';
+import utils from '../utils';
 
 
 
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
+// function Alert(props) {
+//   return <MuiAlert elevation={6} variant="filled" {...props} />;
+// }
 function ListItemLink(props) {
   return <ListItem button component="a" {...props} />;
 }
@@ -54,17 +58,25 @@ function ListItemLink(props) {
 
 export default function MainPage(props) {
   const classes = useStyles();
+  const auth = utils.getCookie('Authorization')
   const [state, setState] = React.useState({
-    isDrawerOpen: false
+    isDrawerOpen: false,
+    isLogin: auth === null ? false : true,
   });
 
   let words_search = ''
+
+  let loginNoticeDisplayDisabled = localStorage.getItem('loginNoticeDisplayDisabled')
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+  function closeLoginNoticeForever() {
+    localStorage.setItem('loginNoticeDisplayDisabled', true)
+  }
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -83,6 +95,18 @@ export default function MainPage(props) {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
+  const isLoginNotice = loginNoticeDisplayDisabled ? undefined : (<div aria-label="display login notice">
+    {state.isLogin ? undefined : <Alert severity="warning" action={
+      <Button color="inherit" size="small" onClick={closeLoginNoticeForever}>
+        不再显示
+        </Button>
+    }>您还未登录，登录可以使用更多网站功能。</Alert>}
+  </div>)
+
+  const searchPart = (<div aria-label="search actions part">
+
+  </div>)
+
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
     <Menu
@@ -94,8 +118,8 @@ export default function MainPage(props) {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleMenuClose}>账户设置</MenuItem>
+      <MenuItem onClick={handleMenuClose}>我的空间</MenuItem>
     </Menu>
   );
 
@@ -111,21 +135,21 @@ export default function MainPage(props) {
       onClose={handleMobileMenuClose}
     >
       <MenuItem>
-        <IconButton aria-label="show 4 new mails" color="inherit">
+        <IconButton aria-label="show messages" color="inherit">
           <Badge badgeContent={4} color="secondary">
             <MailIcon />
           </Badge>
         </IconButton>
-        <p>Messages</p>
+        <p>信息</p>
       </MenuItem>
-      <MenuItem>
+      {/* <MenuItem>
         <IconButton aria-label="show 11 new notifications" color="inherit">
           <Badge badgeContent={11} color="secondary">
             <NotificationsIcon />
           </Badge>
         </IconButton>
-        <p>Notifications</p>
-      </MenuItem>
+        <p>提醒</p>
+      </MenuItem> */}
       <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
           aria-label="account of current user"
@@ -135,7 +159,7 @@ export default function MainPage(props) {
         >
           <AccountCircle />
         </IconButton>
-        <p>Profile</p>
+        <p>个人主页</p>
       </MenuItem>
     </Menu>
   );
@@ -182,7 +206,7 @@ export default function MainPage(props) {
               fullWidth
               onChange={(event) => { words_search = event.target.value }}
               onKeyDown={(event) => {
-                if (event.key == 'Enter') {
+                if (event.key === 'Enter') {
                   console.log('Search', words_search)
                   props.history.push('/search/?wd=' + words_search)
                 }
@@ -196,11 +220,11 @@ export default function MainPage(props) {
                 <MailIcon />
               </Badge>
             </IconButton>
-            <IconButton aria-label="show 17 new notifications" color="inherit">
+            {/* <IconButton aria-label="show 17 new notifications" color="inherit">
               <Badge badgeContent={17} color="secondary">
                 <NotificationsIcon />
               </Badge>
-            </IconButton>
+            </IconButton> */}
             <IconButton
               edge="end"
               aria-label="account of current user"
@@ -227,6 +251,15 @@ export default function MainPage(props) {
       </AppBar>
       {renderMobileMenu}
       {renderMenu}
+      <br />
+      <Container>
+        <div>
+          {isLoginNotice}
+        </div>
+        <div>
+          {searchPart}
+        </div>
+      </Container>
     </div>
   );
 }

@@ -9,6 +9,8 @@ import MainPage from './pages/mainPage.js'
 import Search from './pages/search'
 import Config from "./config.ts"
 
+console.disableYellowBox = true
+
 ReactDOM.render(
   <ThemeProvider theme={Config.theme}>
     <Router>

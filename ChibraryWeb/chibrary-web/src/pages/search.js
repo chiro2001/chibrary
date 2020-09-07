@@ -22,7 +22,6 @@ import ListItemText from '@material-ui/core/ListItemText';
 import AtmIcon from '@material-ui/icons/Atm';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import RefreshIcon from '@material-ui/icons/Refresh';
-import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import Drawer from '@material-ui/core/Drawer';
 import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 import MuiAlert from '@material-ui/lab/Alert';
@@ -43,6 +42,7 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import TextField from '@material-ui/core/TextField';
 import Utils from "../utils.js"
+// import $ from 'jquery'
 
 
 
@@ -53,48 +53,59 @@ function ListItemLink(props) {
   return <ListItem button component="a" {...props} />;
 }
 
+let wordsDefault = undefined
+let first_run = true
 
-export default function MainPage(props) {
+export default function SearchPage(props) {
+  // console.log(first_run)
+  function init() {
+    // console.log('first_run detect...', first_run)
+    if (!first_run)
+      return
+    first_run = false
+    // console.log('firse_run true')
+
+    window.addEventListener("popstate", function (e) {
+      first_run = true
+      wordsDefault = undefined
+    }, false);
+
+    let query = Utils.getQuery(props.location.search)
+    // console.log('query', query)
+    if (query.wd !== undefined && wordsDefault === undefined) {
+      // console.log('set default')
+      wordsDefault = query.wd
+      setWords(wordsDefault)
+    }
+  }
   const classes = useStyles();
-  const [state, setState] = React.useState({
-    isDrawerOpen: false
-  });
+  // const [state, setState] = React.useState({
 
-  let words_search = ''
-  let query = undefined
-  console.log(Utils.getQuery(props.location.search))
-  console.log('query', query)
+  // });
+  const [words, setWords] = React.useState(wordsDefault)
+
+  init()
 
   const renderPage = (
     <Container>
-      <TextField id="standard-search" label="书名、用户名" fullWidth type="search" variant="outlined" />
+      <TextField id="search-box" label="书名、用户名" value={words} onChange={(event) => {
+        setWords(event.target.value)
+      }} fullWidth type="search" variant="outlined" />
     </Container>
   )
 
   return (
     <div className={classes.grow}>
-      <Drawer open={state.isDrawerOpen} onClose={() => { setState(!state.isDrawerOpen) }}>
-        <div style={{ width: 240 + 'px' }}>
-          <List component="nav" aria-label="main mailbox folders">
-            <ListItemLink button href='https://gitee.com/chiro2001/chibrary'>
-              <ListItemIcon>
-                <GitHubIcon />
-              </ListItemIcon>
-              <ListItemText primary="关于" />
-            </ListItemLink>
-          </List>
-        </div>
-      </Drawer>
       <AppBar position="static">
         <Toolbar>
           <IconButton
             edge="start"
             className={classes.menuButton}
             color="inherit"
-            aria-label="open drawer"
-            onClick={() => { setState({ isDrawerOpen: !state.isDrawerOpen }) }}
+            aria-label="back"
+            onClick={() => { props.history.go(-1) }}
           >
-            <MenuIcon />
+            <ArrowBackIcon />
           </IconButton>
           <Typography className={classes.title} variant="h6" noWrap>
             Chibrary · 搜索
