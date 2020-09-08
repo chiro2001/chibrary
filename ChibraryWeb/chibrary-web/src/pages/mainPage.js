@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -7,6 +8,9 @@ import Typography from '@material-ui/core/Typography';
 import DehazeIcon from '@material-ui/icons/Dehaze';
 import Container from '@material-ui/core/Container';
 import Paper from "@material-ui/core/Paper"
+import Card from "@material-ui/core/Card"
+import Grid from "@material-ui/core/Grid"
+import Rating from "@material-ui/lab/Rating"
 import Button from "@material-ui/core/Button"
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -21,6 +25,14 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import AtmIcon from '@material-ui/icons/Atm';
 import GitHubIcon from '@material-ui/icons/GitHub';
+import ArrowRightIcon from '@material-ui/icons/ArrowRight';
+import ModeCommentIcon from '@material-ui/icons/ModeComment';
+import HomeIcon from '@material-ui/icons/Home';
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+import ForumIcon from '@material-ui/icons/Forum';
+import AddIcon from '@material-ui/icons/Add';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+
 import RefreshIcon from '@material-ui/icons/Refresh';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import Drawer from '@material-ui/core/Drawer';
@@ -39,6 +51,8 @@ import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
+import VpnKeyIcon from '@material-ui/icons/VpnKey';
+import Chip from '@material-ui/core/Chip';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import Alert from '@material-ui/lab/Alert';
@@ -97,18 +111,163 @@ export default function MainPage(props) {
 
   const isLoginNotice = loginNoticeDisplayDisabled ? undefined : (<div aria-label="display login notice">
     {state.isLogin ? undefined : <Alert severity="warning" action={
-      <Button color="inherit" size="small" onClick={closeLoginNoticeForever}>
-        不再显示
+      <div>
+        <Button color="inherit" size="small">
+          登录
         </Button>
+        <Button color="inherit" size="small" onClick={closeLoginNoticeForever}>
+          不再显示
+        </Button>
+      </div>
     }>您还未登录，登录可以使用更多网站功能。</Alert>}
   </div>)
 
   const searchPart = (<div aria-label="search actions part">
-
+    <Button
+      variant="contained"
+      size="large"
+      className={classes.button}
+      // startIcon={<SearchIcon />}
+      // color="secondary"
+      color="primary"
+      style={{ borderRadius: 90, width: '100%' }}
+      onClick={() => {
+        props.history.push('/search')
+      }}
+    >
+      <SearchIcon style={{ height: 60, width: 60 }} />
+      <h2>找书、找用户、找tags</h2>
+    </Button>
   </div>)
 
+  const tagsPart = (
+    <div aria-label="tags actions part">
+      <Typography variant="h4" gutterBottom className={classes.headers}>
+        流行的TAGS
+      </Typography>
+      <div>
+        <Chip label="轻小说" style={{ margin: '1%' }} />
+        <Chip label="轻文学" style={{ margin: '1%' }} />
+        <Chip label="经典" style={{ margin: '1%' }} />
+      </div>
+    </div>
+  )
+
+  const books = []
+
+  for (let i = 0; i < 4; i++) {
+    books.push(<Card className={classes.bookCard}>
+      <div style={{ width: '100%', display: 'flex', justifyContent: 'space-around', alignItems: 'flex-start' }}>
+        <Typography variant="h5" gutterBottom className={classes.headers}>
+          果然我的青春恋爱喜剧搞错了
+        </Typography>
+        <Rating value={3.4} readOnly />
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', overflow: 'hidden' }}>
+        <Typography variant="body1" style={{ maxWidth: 220, maxHeight: 300 }}>
+          别扭的，没有朋友，没有女朋友，对着那些讴歌青春的同学吐槽着“他们都是骗子，都在说谎，快点爆发把我”的男主角的爱情物语，将来的梦想是“不工作”——
+          这样的高中生八幡被生活指导老师的带到了学校第一美少女雪乃所属的“侍奉部”，与美少女意想不到的相遇……怎么想都是恋爱故事的展开吧！？
+          但是雪乃却无论如何都原谅不了八幡那令人残念的糟糕性格！
+          不断轮回着的充满问题的青春——我的青春，到底怎么了！？
+        </Typography>
+        <img src='http://img.wenku8.com/image/1/1213/1213s.jpg' style={{ width: 180 }}></img>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', overflow: 'hidden' }}>
+        <Button color="primary">阅读<ArrowRightIcon /></Button>
+        <Button color="primary" startIcon={<ModeCommentIcon />}>332</Button>
+        <Chip label="轻小说" />
+      </div>
+    </Card>)
+  }
+
+  const booksPart = (
+    <div aria-label="books actions part">
+      <Typography variant="h4" gutterBottom className={classes.headers}>
+        热门书籍
+      </Typography>
+      <Grid
+        className={classes.booksGrid}
+        spacing={2}
+        container
+        direction="row"
+        justify="flex-start"
+        alignItems="center"
+      >
+        {books}
+      </Grid>
+    </div >
+  )
+
+  const booksComentsPart = (
+    <div aria-label="square actions part">
+      <Typography variant="h5" gutterBottom className={classes.headers}>
+        书评区
+      </Typography>
+    </div>
+  )
+
+  const recommendsPart = (
+    <div aria-label="square actions part">
+      <Typography variant="h5" gutterBottom className={classes.headers}>
+        好书推荐
+      </Typography>
+    </div>
+  )
+
+  const waterPart = (
+    <div aria-label="square actions part">
+      <Typography variant="h5" gutterBottom className={classes.headers}>
+        水贴区
+      </Typography>
+    </div>
+  )
+
+  const addPart = (
+    <div aria-label="add actions part">
+      <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
+        <Button
+          variant="contained"
+          size="large"
+          className={classes.button}
+          startIcon={<AddIcon />}
+          // color="secondary"
+          color="primary"
+          style={{ borderRadius: 90, width: '46%' }}
+        >
+          新建书籍
+        </Button>
+        <div style={{ width: '4%' }}></div>
+        <Button
+          variant="contained"
+          color="secondary"
+          size="large"
+          className={classes.button}
+          startIcon={<CloudUploadIcon />}
+          // color="secondary"
+          style={{ borderRadius: 90, width: '46%' }}
+        >
+          我要上传
+        </Button>
+      </div>
+    </div>
+  )
+
+  const squarePart = (
+    <div aria-label="square actions part">
+      <Typography variant="h4" gutterBottom className={classes.headers}>
+        广场
+      </Typography>
+      {booksComentsPart}
+      <br />
+      {recommendsPart}
+      <br />
+      {waterPart}
+      <br />
+    </div>
+  )
+
   const menuId = 'primary-search-account-menu';
-  const renderMenu = (
+  const renderMenu = state.isLogin ? (
     <Menu
       anchorEl={anchorEl}
       anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
@@ -121,10 +280,22 @@ export default function MainPage(props) {
       <MenuItem onClick={handleMenuClose}>账户设置</MenuItem>
       <MenuItem onClick={handleMenuClose}>我的空间</MenuItem>
     </Menu>
-  );
+  ) : (
+      <Menu
+        anchorEl={anchorEl}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        id={menuId}
+        keepMounted
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        open={isMenuOpen}
+        onClose={handleMenuClose}
+      >
+        <MenuItem onClick={handleMenuClose}>登录</MenuItem>
+      </Menu>
+    );
 
   const mobileMenuId = 'primary-search-account-menu-mobile';
-  const renderMobileMenu = (
+  const renderMobileMenu = state.isLogin ? (
     <Menu
       anchorEl={mobileMoreAnchorEl}
       anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
@@ -162,13 +333,68 @@ export default function MainPage(props) {
         <p>个人主页</p>
       </MenuItem>
     </Menu>
-  );
+  ) : (
+      <Menu
+        anchorEl={mobileMoreAnchorEl}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        id={mobileMenuId}
+        keepMounted
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        open={isMobileMenuOpen}
+        onClose={handleMobileMenuClose}
+      >
+        <MenuItem
+          onClick={handleMenuClose}>
+          <IconButton
+            aria-label="account of current user"
+            aria-controls="primary-search-account-menu"
+            aria-haspopup="true"
+            color="inherit"
+          >
+            <VpnKeyIcon />
+          </IconButton>
+          <p>登录</p>
+        </MenuItem>
+      </Menu>
+    );
 
   return (
     <div className={classes.grow}>
       <Drawer open={state.isDrawerOpen} onClose={() => { setState(!state.isDrawerOpen) }}>
         <div style={{ width: 240 + 'px' }}>
           <List component="nav" aria-label="main mailbox folders">
+            <ListItemLink button href='/index'>
+              <ListItemIcon>
+                <HomeIcon />
+              </ListItemIcon>
+              <ListItemText primary="主页" />
+            </ListItemLink>
+            <ListItemLink button onClick={() => { props.history.push('/search/?wd=') }}>
+              <ListItemIcon>
+                <SearchIcon />
+              </ListItemIcon>
+              <ListItemText primary="搜索" />
+            </ListItemLink>
+            {/* <Link to='/search/?wd='>搜索</Link> */}
+            <ListItemLink button onClick={() => { props.history.push('/search/?wd=') }}>
+              <ListItemIcon>
+                <ModeCommentIcon />
+              </ListItemIcon>
+              <ListItemText primary="书评区" />
+            </ListItemLink>
+            <ListItemLink button onClick={() => { props.history.push('/search/?wd=') }}>
+              <ListItemIcon>
+                <ThumbUpIcon />
+              </ListItemIcon>
+              <ListItemText primary="好书推荐" />
+            </ListItemLink>
+            <ListItemLink button onClick={() => { props.history.push('/search/?wd=') }}>
+              <ListItemIcon>
+                <ForumIcon />
+              </ListItemIcon>
+              <ListItemText primary="水贴区" />
+            </ListItemLink>
+
             <ListItemLink button href='https://gitee.com/chiro2001/chibrary'>
               <ListItemIcon>
                 <GitHubIcon />
@@ -256,8 +482,25 @@ export default function MainPage(props) {
         <div>
           {isLoginNotice}
         </div>
+        <br />
         <div>
           {searchPart}
+        </div>
+        <br />
+        <div>
+          {tagsPart}
+        </div>
+        <br />
+        <div>
+          {booksPart}
+        </div>
+        <br />
+        <div>
+          {addPart}
+        </div>
+        <br />
+        <div>
+          {squarePart}
         </div>
       </Container>
     </div>
@@ -272,6 +515,18 @@ const useStyles = makeStyles((theme) => ({
   },
   menuButton: {
     marginRight: theme.spacing(2),
+  },
+  booksGrid: {
+
+  },
+  bookCard: {
+    padding: theme.spacing(2),
+    margin: theme.spacing(1),
+    maxWidth: 300,
+    maxHeight: 400,
+  },
+  headers: {
+    color: theme.palette.primary.main
   },
   title: {
     display: 'none',

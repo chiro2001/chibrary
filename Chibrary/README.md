@@ -85,7 +85,7 @@
         - createdAt
         - lastUpdate
         - starCount (评分人数)
-        - tags: list
+        - tags: list    // TODO: 把这个结构动态生成。
 
 ----------
 

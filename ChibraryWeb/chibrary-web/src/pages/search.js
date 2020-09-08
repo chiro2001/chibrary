@@ -6,7 +6,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import DehazeIcon from '@material-ui/icons/Dehaze';
 import Container from '@material-ui/core/Container';
-import Paper from "@material-ui/core/Paper"
+import Chip from "@material-ui/core/Chip"
 import Button from "@material-ui/core/Button"
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -42,6 +42,7 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import TextField from '@material-ui/core/TextField';
 import Utils from "../utils.js"
+import BookItem from "../components/bookItem"
 // import $ from 'jquery'
 
 
@@ -79,18 +80,88 @@ export default function SearchPage(props) {
     }
   }
   const classes = useStyles();
-  // const [state, setState] = React.useState({
-
-  // });
+  const [state, setState] = React.useState({
+    resultTags: ['轻小说', '悬疑', '文学', '轻文学', '经典'],
+    resultBooks: [{
+      name: '测试书籍',
+      bid: 1,
+      sources: {
+        wenku8: {
+          name: 'wenku8',
+          username: 'chiro',
+          args: {
+            key: '测试书籍.epub'
+          },
+          data: {
+            lastUpdate: 437289,
+            update: '自动更新'
+          }
+        }
+      },
+      info: {
+        name: '测试书籍',
+        description: '这本书只是用来测试的，并没有什么特殊的，这里的字也是用来测试的。我只是想打的长一点而已。',
+        author: '暗色银云',
+        stars: 4,
+        bid: 1,
+        cover: 'http://img.wenku8.com/image/1/1213/1213s.jpg',
+        createdAt: 564238,
+        lastUpdate: 254678,
+        starCount: 273,
+        tags: ['轻小说', '爱情', '模板']
+      }
+    }],
+    resultUsers: [{
+      username: 'chiro',
+      info: {
+        createdAt: 436782,
+        lastLogin: 347298,
+        level: 10,
+        birthday: 5467383,
+        gender: '♂',
+        head: 'http://bed-1254016670.cos.ap-guangzhou.myqcloud.com/my_imgs/6i8ZPn__head_fin.png',
+        status: 'normal'
+      },
+      statistics: {}
+    }],
+  });
   const [words, setWords] = React.useState(wordsDefault)
 
   init()
 
+  let resultDomTags = state.resultTags.map((tag) => <Chip key={state.resultTags.indexOf(tag)} label={tag} style={{ margin: '1%' }} />)
+
+  const resultPartTags = (
+    <div aria-label="tags actions part">
+      <Typography variant="h5" gutterBottom className={classes.headers}>
+        搜索到的TAGS
+      </Typography>
+      <div>
+        {resultDomTags}
+      </div>
+    </div>
+  )
+
+  let resultDomBooksItems = state.resultBooks.map((book) => <BookItem key={state.resultBooks.indexOf(book)} book={book} />)
+
+  let resultDomBooks = (
+    <div>
+      <Typography variant="h5" gutterBottom className={classes.headers}>
+        搜索到的书籍
+      </Typography>
+      {resultDomBooksItems}
+    </div>
+  )
+
   const renderPage = (
     <Container>
-      <TextField id="search-box" label="书名、用户名" value={words} onChange={(event) => {
+      <TextField id="search-box" label="书名、用户名、Tag" value={words} onChange={(event) => {
         setWords(event.target.value)
       }} fullWidth type="search" variant="outlined" />
+      <br /><br />
+      {resultPartTags}
+      <br />
+      {resultDomBooks}
     </Container>
   )
 
@@ -182,6 +253,18 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.up('md')]: {
       display: 'none',
     },
+  },
+  booksGrid: {
+
+  },
+  bookCard: {
+    padding: theme.spacing(2),
+    margin: theme.spacing(1),
+    maxWidth: 300,
+    maxHeight: 400,
+  },
+  headers: {
+    color: theme.palette.primary.main
   },
 }));
 
