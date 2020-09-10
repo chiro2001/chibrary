@@ -57,6 +57,7 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import Alert from '@material-ui/lab/Alert';
 import Collapse from '@material-ui/core/Collapse'
+import BookItem from "../components/bookItem"
 import { utc } from 'moment';
 import utils from '../utils';
 
@@ -156,28 +157,35 @@ export default function MainPage(props) {
   const books = []
 
   for (let i = 0; i < 4; i++) {
-    books.push(<Card className={classes.bookCard}>
-      <div style={{ width: '100%', display: 'flex', justifyContent: 'space-around', alignItems: 'flex-start' }}>
-        <Typography variant="h5" gutterBottom className={classes.headers}>
-          果然我的青春恋爱喜剧搞错了
-        </Typography>
-        <Rating value={3.4} readOnly />
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', overflow: 'hidden' }}>
-        <Typography variant="body1" style={{ maxWidth: 220, maxHeight: 300 }}>
-          别扭的，没有朋友，没有女朋友，对着那些讴歌青春的同学吐槽着“他们都是骗子，都在说谎，快点爆发把我”的男主角的爱情物语，将来的梦想是“不工作”——
-          这样的高中生八幡被生活指导老师的带到了学校第一美少女雪乃所属的“侍奉部”，与美少女意想不到的相遇……怎么想都是恋爱故事的展开吧！？
-          但是雪乃却无论如何都原谅不了八幡那令人残念的糟糕性格！
-          不断轮回着的充满问题的青春——我的青春，到底怎么了！？
-        </Typography>
-        <img src='http://img.wenku8.com/image/1/1213/1213s.jpg' style={{ width: 180 }}></img>
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', overflow: 'hidden' }}>
-        <Button color="primary">阅读<ArrowRightIcon /></Button>
-        <Button color="primary" startIcon={<ModeCommentIcon />}>332</Button>
-        <Chip label="轻小说" />
-      </div>
-    </Card>)
+    books.push(<BookItem book={{
+      name: '测试书籍',
+      bid: 1,
+      sources: {
+        wenku8: {
+          name: 'wenku8',
+          username: 'chiro',
+          args: {
+            key: '测试书籍.epub'
+          },
+          data: {
+            lastUpdate: 437289,
+            update: '自动更新'
+          }
+        }
+      },
+      info: {
+        name: '测试书籍',
+        description: '这本书只是用来测试的，并没有什么特殊的，这里的字也是用来测试的。我只是想打的长一点而已。',
+        author: '暗色银云',
+        stars: 4,
+        bid: 1,
+        cover: 'http://bed-1254016670.cos.ap-guangzhou.myqcloud.com/my_imgs/MR3EcJ_place_holder.png',
+        createdAt: 564238,
+        lastUpdate: 254678,
+        starCount: 273,
+        tags: ['爱情', '模板']
+      }
+    }} />)
   }
 
   const booksPart = (

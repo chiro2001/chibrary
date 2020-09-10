@@ -8,8 +8,11 @@ import * as serviceWorker from './serviceWorker';
 import MainPage from './pages/mainPage.js'
 import Search from './pages/search'
 import Config from "./config.ts"
+import utils from "./utils"
 
 console.disableYellowBox = true
+
+utils.showTimeInit()
 
 ReactDOM.render(
   <ThemeProvider theme={Config.theme}>

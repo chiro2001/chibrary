@@ -43,6 +43,7 @@ import MoreIcon from '@material-ui/icons/MoreVert';
 import TextField from '@material-ui/core/TextField';
 import Utils from "../utils.js"
 import BookItem from "../components/bookItem"
+import UserItem from "../components/userItem"
 // import $ from 'jquery'
 
 
@@ -104,11 +105,11 @@ export default function SearchPage(props) {
         author: '暗色银云',
         stars: 4,
         bid: 1,
-        cover: 'http://img.wenku8.com/image/1/1213/1213s.jpg',
+        cover: 'http://bed-1254016670.cos.ap-guang_zhou.myqcloud.com/my_imgs/MR3EcJ_place_holder.png',
         createdAt: 564238,
         lastUpdate: 254678,
         starCount: 273,
-        tags: ['轻小说', '爱情', '模板']
+        tags: ['爱情', '模板']
       }
     }],
     resultUsers: [{
@@ -153,6 +154,17 @@ export default function SearchPage(props) {
     </div>
   )
 
+  let resultDomUsersItems = state.resultUsers.map((user) => <UserItem user={user} />)
+
+  let resultDomUsers = (
+    <div>
+      <Typography variant="h5" gutterBottom className={classes.headers}>
+        搜索到的用户
+      </Typography>
+      {resultDomUsersItems}
+    </div>
+  )
+
   const renderPage = (
     <Container>
       <TextField id="search-box" label="书名、用户名、Tag" value={words} onChange={(event) => {
@@ -162,6 +174,8 @@ export default function SearchPage(props) {
       {resultPartTags}
       <br />
       {resultDomBooks}
+      <br />
+      {resultDomUsers}
     </Container>
   )
 
